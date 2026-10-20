@@ -35,7 +35,12 @@ struct SettingsView: View {
                         ? "History cleared."
                         : "\(historyCount) commands run from this phone boost the ranking. Stored only on this device.")
                 }
-                Section { LabeledContent("Version", value: buildInfo.display) }
+                Section {
+                    LabeledContent("Version", value: buildInfo.display)
+                        .accessibilityIdentifier("aboutVersion")
+                } header: {
+                    Text("About")
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

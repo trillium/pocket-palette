@@ -16,6 +16,8 @@ xcuserdata/
 
 # Machine-local overrides
 Config/Local.xcconfig
+# Generated from git tags by scripts/version.sh
+Config/Version.xcconfig
 
 # Never commit signing material or credentials (enforced by scripts/check-secrets.sh)
 *.p8

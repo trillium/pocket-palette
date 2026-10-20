@@ -1,5 +1,7 @@
 # Mac engine module: the HTTP contract the app relies on
 
+**Contract version: 1.0.0.** The contract is versioned on its own, apart from the app (`docs/versioning.md`): a breaking change to anything below bumps its MAJOR and forces an app MAJOR.
+
 The app talks to one HTTP service on the Mac. Whatever engine runs commands there (a voice-control system, a hotkey daemon, a script runner) is wrapped by an **engine module** that serves these calls. `App/Tests/PaletteAPITests.swift` pins the client side of this contract.
 
 | Call | Notes |

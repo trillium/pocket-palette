@@ -6,10 +6,11 @@ APP_NAME = PocketPalette
 DISPLAY_NAME = PocketPalette
 PRODUCT_BUNDLE_IDENTIFIER = com.trillium.pocketpalette
 
-// MARKETING_VERSION is the user-facing version; CURRENT_PROJECT_VERSION is the build number.
-// TestFlight rejects a build number it has already seen for a version: run `make bump` before `make archive`.
-MARKETING_VERSION = 0.1.0
+// Version is derived from git tags, never hand-edited (docs/versioning.md). These are only fallbacks for a
+// checkout with no git history; `make generate` writes Config/Version.xcconfig (gitignored), which overrides them.
+MARKETING_VERSION = 0.0.0
 CURRENT_PROJECT_VERSION = 1
+#include? "Version.xcconfig"
 
 // Feed host:port the app is prefilled with (Info.plist PaletteServerURL = http://$(PALETTE_SERVER_HOST)).
 // Set it in the gitignored Config/Local.xcconfig, never here. Empty = the app starts "Not set up".
