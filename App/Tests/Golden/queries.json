@@ -1,0 +1,185 @@
+{
+ "note": "Spoken-style queries. expect = acceptable command ids; a query passes when any appears in the top 3.",
+ "queries": [
+  {
+   "query": "open a new tab please",
+   "expect": [
+    "g001"
+   ]
+  },
+  {
+   "query": "close tab",
+   "expect": [
+    "g002"
+   ]
+  },
+  {
+   "query": "next tab",
+   "expect": [
+    "g003"
+   ]
+  },
+  {
+   "query": "go to previous tab",
+   "expect": [
+    "g004"
+   ]
+  },
+  {
+   "query": "reopen last tab",
+   "expect": [
+    "g005"
+   ]
+  },
+  {
+   "query": "minimise window",
+   "expect": [
+    "g008"
+   ]
+  },
+  {
+   "query": "copy",
+   "expect": [
+    "g011"
+   ]
+  },
+  {
+   "query": "paste",
+   "expect": [
+    "g012"
+   ]
+  },
+  {
+   "query": "select everything",
+   "expect": [
+    "g014"
+   ]
+  },
+  {
+   "query": "undo",
+   "expect": [
+    "g015"
+   ]
+  },
+  {
+   "query": "save the file",
+   "expect": [
+    "g017"
+   ]
+  },
+  {
+   "query": "jump to line 40",
+   "expect": [
+    "g019"
+   ]
+  },
+  {
+   "query": "turn the volume up",
+   "expect": [
+    "g031"
+   ]
+  },
+  {
+   "query": "pause the music please",
+   "expect": [
+    "g034"
+   ]
+  },
+  {
+   "query": "skip song",
+   "expect": [
+    "g035"
+   ]
+  },
+  {
+   "query": "take a screenshot of the screen",
+   "expect": [
+    "g037"
+   ]
+  },
+  {
+   "query": "lock my computer",
+   "expect": [
+    "g039"
+   ]
+  },
+  {
+   "query": "launch spotlight",
+   "expect": [
+    "g046"
+   ]
+  },
+  {
+   "query": "clipboard history",
+   "expect": [
+    "g047"
+   ]
+  },
+  {
+   "query": "dark mode",
+   "expect": [
+    "g048"
+   ]
+  },
+  {
+   "query": "reload the page",
+   "expect": [
+    "g057"
+   ]
+  },
+  {
+   "query": "go back",
+   "expect": [
+    "g058"
+   ]
+  },
+  {
+   "query": "open dev tools",
+   "expect": [
+    "g063"
+   ]
+  },
+  {
+   "query": "incognito",
+   "expect": [
+    "g064"
+   ]
+  },
+  {
+   "query": "clear the terminal",
+   "expect": [
+    "g070"
+   ]
+  },
+  {
+   "query": "toggle sidebars",
+   "expect": [
+    "g077"
+   ]
+  },
+  {
+   "query": "jump to the definition",
+   "expect": [
+    "g079"
+   ]
+  },
+  {
+   "query": "set a breakpoint",
+   "expect": [
+    "g084"
+   ]
+  },
+  {
+   "query": "mute mic",
+   "expect": [
+    "g097"
+   ]
+  },
+  {
+   "query": "reply to all",
+   "expect": [
+    "g091"
+   ]
+  }
+ ]
+}

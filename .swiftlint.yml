@@ -1,0 +1,13 @@
+included:
+  - App
+  - Widget
+excluded:
+  - build
+  - DerivedData
+disabled_rules:
+  - trailing_comma
+line_length:
+  warning: 140
+  error: 200
+identifier_name:
+  excluded: [n, ok, ts, id]  # field names fixed by the feed's JSON (docs/api-contract.md)

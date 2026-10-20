@@ -1,0 +1,15 @@
+# Shape only until a remote exists. `make check` is the real gate and is what pre-push runs.
+name: CI
+on:
+  pull_request:
+    branches: [main]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen swiftlint shellcheck
+      - run: make check

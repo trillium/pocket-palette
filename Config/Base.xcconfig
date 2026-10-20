@@ -1,0 +1,18 @@
+// Single source of truth for per-app identity and version. Scripts and Xcode both read this file.
+// Override locally (never committed) in Config/Local.xcconfig -- see Local.xcconfig.example.
+// Set DEVELOPMENT_TEAM in Config/Local.xcconfig (gitignored). Keys live outside git (docs/signing.md).
+
+APP_NAME = PocketPalette
+DISPLAY_NAME = PocketPalette
+PRODUCT_BUNDLE_IDENTIFIER = com.trillium.pocketpalette
+
+// MARKETING_VERSION is the user-facing version; CURRENT_PROJECT_VERSION is the build number.
+// TestFlight rejects a build number it has already seen for a version: run `make bump` before `make archive`.
+MARKETING_VERSION = 0.1.0
+CURRENT_PROJECT_VERSION = 1
+
+// Feed host:port the app is prefilled with (Info.plist PaletteServerURL = http://$(PALETTE_SERVER_HOST)).
+// Set it in the gitignored Config/Local.xcconfig, never here. Empty = the app starts "Not set up".
+PALETTE_SERVER_HOST =
+
+#include? "Local.xcconfig"

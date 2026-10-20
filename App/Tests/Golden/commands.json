@@ -1,0 +1,950 @@
+{
+ "note": "Fixed fixture of realistic voice-command rules for the golden-query test. Do not edit casually: changing it changes the baseline.",
+ "commands": [
+  {
+   "id": "g001",
+   "rule": "tab (new|open)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g002",
+   "rule": "tab close",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g003",
+   "rule": "tab (next|right)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g004",
+   "rule": "tab (last|previous|left)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g005",
+   "rule": "tab reopen",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g006",
+   "rule": "window (new|open)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g007",
+   "rule": "window close",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g008",
+   "rule": "window (minimize|minimise)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g009",
+   "rule": "window (maximize|full screen)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g010",
+   "rule": "window next",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g011",
+   "rule": "(copy|yank) that",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g012",
+   "rule": "(paste|pace) that",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g013",
+   "rule": "cut that",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g014",
+   "rule": "select all",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g015",
+   "rule": "undo that",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g016",
+   "rule": "redo that",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g017",
+   "rule": "save (file|that)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g018",
+   "rule": "find (in file|text)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g019",
+   "rule": "(go|jump) to line <number>",
+   "kind": "capture",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g020",
+   "rule": "go (up|down) <number>",
+   "kind": "capture",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g021",
+   "rule": "page (up|down)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g022",
+   "rule": "(scroll|roll) top",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g023",
+   "rule": "(scroll|roll) bottom",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g024",
+   "rule": "delete line",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g025",
+   "rule": "duplicate line",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g026",
+   "rule": "(select|grab) line",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g027",
+   "rule": "(select|grab) word",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g028",
+   "rule": "comment line",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g029",
+   "rule": "indent (line|more)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g030",
+   "rule": "outdent (line|less)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g031",
+   "rule": "(volume|sound) up",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g032",
+   "rule": "(volume|sound) down",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g033",
+   "rule": "(mute|unmute) (sound|volume)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g034",
+   "rule": "(play|pause) music",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g035",
+   "rule": "(next|skip) (track|song)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g036",
+   "rule": "(previous|last) (track|song)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g037",
+   "rule": "screenshot (full|screen)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g038",
+   "rule": "screenshot (area|selection)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g039",
+   "rule": "(lock|sleep) (screen|computer)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g040",
+   "rule": "(show|hide) desktop",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g041",
+   "rule": "(open|launch) <app>",
+   "kind": "capture",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g042",
+   "rule": "focus <app>",
+   "kind": "capture",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g043",
+   "rule": "(switch|swap) application",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g044",
+   "rule": "(close|quit) application",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g045",
+   "rule": "(search|google) <text>",
+   "kind": "capture",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g046",
+   "rule": "(open|launch) spotlight",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g047",
+   "rule": "(open|show) (clipboard|clip) history",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g048",
+   "rule": "(toggle|switch) dark mode",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g049",
+   "rule": "(speech|voice) (sleep|off)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g050",
+   "rule": "(speech|voice) wake",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g051",
+   "rule": "(speech|voice) (sleep|go to sleep)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g052",
+   "rule": "(copy|get) selection to clipboard",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g053",
+   "rule": "(empty|clear) trash",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g054",
+   "rule": "(zoom|magnify) in",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g055",
+   "rule": "(zoom|magnify) out",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g056",
+   "rule": "(zoom|magnify) reset",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g057",
+   "rule": "(refresh|reload) page",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g058",
+   "rule": "(go|navigate) back",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g059",
+   "rule": "(go|navigate) forward",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g060",
+   "rule": "(focus|go to) address bar",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g061",
+   "rule": "bookmark (this|page)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g062",
+   "rule": "(show|open) (downloads|download list)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g063",
+   "rule": "(open|show) developer tools",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g064",
+   "rule": "(private|incognito) window",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Google Chrome",
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g065",
+   "rule": "(reader|reading) mode",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Safari"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g066",
+   "rule": "(split|pane) (right|vertical)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g067",
+   "rule": "(split|pane) (down|horizontal)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g068",
+   "rule": "pane (close|kill)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g069",
+   "rule": "pane (next|other)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g070",
+   "rule": "(clear|wipe) terminal",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g071",
+   "rule": "(kill|cancel) process",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g072",
+   "rule": "(run|repeat) last command",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g073",
+   "rule": "(search|find) history",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "WezTerm"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g074",
+   "rule": "(show|open) command palette",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g075",
+   "rule": "(go to|open) file",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g076",
+   "rule": "(go to|open) symbol",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g077",
+   "rule": "(toggle|show|hide) sidebar",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g078",
+   "rule": "(toggle|show|hide) terminal",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g079",
+   "rule": "(go to|jump to) definition",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g080",
+   "rule": "(find|show) references",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g081",
+   "rule": "(rename|refactor) symbol",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g082",
+   "rule": "(format|beautify) document",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g083",
+   "rule": "(fix|quick fix) this",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g084",
+   "rule": "(toggle|set) breakpoint",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g085",
+   "rule": "(step|debug) over",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g086",
+   "rule": "(step|debug) into",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g087",
+   "rule": "(start|run) debugging",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g088",
+   "rule": "(new|create) file",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Visual Studio Code"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g089",
+   "rule": "(compose|new) (message|email)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Mail"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g090",
+   "rule": "(send|ship) (message|email)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Mail"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g091",
+   "rule": "reply all",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Mail"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g092",
+   "rule": "(archive|file away) (message|email)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Mail"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g093",
+   "rule": "(mark|flag) (as )?unread",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Mail"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g094",
+   "rule": "(new|create) note",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Notes"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g095",
+   "rule": "(new|create) (event|meeting)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Calendar"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g096",
+   "rule": "(go to|jump to) today",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "Calendar"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g097",
+   "rule": "(mute|unmute) (microphone|mic)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "zoom.us"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g098",
+   "rule": "(start|stop) (video|camera)",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "zoom.us"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g099",
+   "rule": "(share|present) screen",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "zoom.us"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g100",
+   "rule": "(leave|end) meeting",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "zoom.us"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g101",
+   "rule": "(raise|lower) hand",
+   "kind": "literal",
+   "scope": "app",
+   "apps": [
+    "zoom.us"
+   ],
+   "tags": []
+  },
+  {
+   "id": "g102",
+   "rule": "(open|new) (terminal|shell)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g103",
+   "rule": "(show|open) (settings|preferences)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g104",
+   "rule": "(force|kill) quit",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g105",
+   "rule": "(emoji|symbol) picker",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  },
+  {
+   "id": "g106",
+   "rule": "(take|start) (note|memo)",
+   "kind": "literal",
+   "scope": "global",
+   "apps": [],
+   "tags": []
+  }
+ ]
+}

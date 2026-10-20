@@ -1,0 +1,6 @@
+// Copy to Config/Local.xcconfig (gitignored) to override identity on this machine only.
+// DEVELOPMENT_TEAM = ABCDE12345
+// PRODUCT_BUNDLE_IDENTIFIER = com.yourname.myapp.dev
+// Prefill the feed server at build time: host:port only, no scheme (in an xcconfig "//" starts a comment).
+// The app turns it into http://<host:port>; plain http is allowed for *.ts.net only (ATS exception).
+// PALETTE_SERVER_HOST = macbook.your-tailnet.ts.net:7399

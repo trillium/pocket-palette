@@ -1,0 +1,105 @@
+import Foundation
+
+/// What the home/Lock Screen widget shows: the top commands, already ranked by the app, plus enough state to
+/// say how fresh it is. Shared source: compiled into the app and the widget extension, so it depends on nothing
+/// else in the app. Holds rule text only, never the token or the server URL.
+struct WidgetSnapshot: Codable, Equatable, Sendable {
+    struct Item: Codable, Equatable, Identifiable, Sendable {
+        let id: String
+        let rule: String
+        /// Subtitle: the defining command file name.
+        let context: String
+        /// "app", "tag" or "global".
+        let scope: String
+
+        /// Tap target: opens the app, which runs it through the same Dry run gate as an in-app tap.
+        var url: URL { WidgetLink.url(forCommand: id) }
+    }
+
+    /// How many rows the widget ever shows.
+    static let limit = 3
+
+    var items: [Item]
+    /// Frontmost Mac app when the snapshot was taken, if known.
+    var appName: String?
+    /// The app's Dry run switch at snapshot time (the widget only displays it; the app enforces it).
+    var dryRun: Bool
+    var updatedAt: Date
+
+    static let empty = WidgetSnapshot(items: [], appName: nil, dryRun: false, updatedAt: .distantPast)
+
+    /// Placeholder content for the widget gallery and previews.
+    static let sample = WidgetSnapshot(
+        items: [
+            Item(id: "s1", rule: "tab (open | new)", context: "browser.voice", scope: "app"),
+            Item(id: "s2", rule: "go back", context: "browser.voice", scope: "app"),
+            Item(id: "s3", rule: "page down", context: "scroll.voice", scope: "global")
+        ],
+        appName: "Safari", dryRun: true, updatedAt: Date()
+    )
+}
+
+/// The `pocketpalette://command?id=...` links the widget opens.
+enum WidgetLink {
+    static let scheme = "pocketpalette"
+
+    static func url(forCommand id: String) -> URL {
+        var parts = URLComponents()
+        parts.scheme = scheme
+        parts.host = "command"
+        parts.queryItems = [URLQueryItem(name: "id", value: id)]
+        return parts.url ?? URL(fileURLWithPath: "/")
+    }
+
+    /// The command id in a widget link, or nil for any other URL.
+    static func commandID(in url: URL) -> String? {
+        guard url.scheme == scheme, url.host == "command",
+              let id = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "id" })?.value,
+              !id.isEmpty else { return nil }
+        return id
+    }
+}
+
+/// The snapshot as one JSON file in the App Group container. Unsigned builds have no container: both sides
+/// then see nil / do nothing, and the widget falls back to its empty state.
+struct WidgetSnapshotStore: Sendable {
+    static let appGroup = "group.com.trillium.pocketpalette"
+    let fileURL: URL?
+
+    static var shared: WidgetSnapshotStore {
+        let base = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)
+        return WidgetSnapshotStore(fileURL: base?.appendingPathComponent("widget-snapshot.json"))
+    }
+
+    func load() -> WidgetSnapshot? {
+        guard let fileURL, let data = try? Data(contentsOf: fileURL) else { return nil }
+        return try? JSONDecoder.snapshot.decode(WidgetSnapshot.self, from: data)
+    }
+
+    /// Returns true when the stored snapshot changed (ignoring `updatedAt`), i.e. the widget should reload.
+    @discardableResult
+    func save(_ snapshot: WidgetSnapshot) -> Bool {
+        guard let fileURL, let data = try? JSONEncoder.snapshot.encode(snapshot) else { return false }
+        if var old = load() {
+            old.updatedAt = snapshot.updatedAt
+            if old == snapshot { return false }
+        }
+        return (try? data.write(to: fileURL, options: .atomic)) != nil
+    }
+}
+
+private extension JSONEncoder {
+    static var snapshot: JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }
+}
+
+private extension JSONDecoder {
+    static var snapshot: JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }
+}
