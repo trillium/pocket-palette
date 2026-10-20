@@ -36,7 +36,7 @@ if is_placeholder "$BUNDLE_ID"; then signing "PRODUCT_BUNDLE_IDENTIFIER is unset
 if printf '%s' "$TEAM_ID" | grep -qE '^[A-Z0-9]{10}$'; then pass "DEVELOPMENT_TEAM=$TEAM_ID"
 else signing "DEVELOPMENT_TEAM is not a 10-character team id (Apple Developer > Membership > Team ID)"; fi
 build="$(cfg CURRENT_PROJECT_VERSION)"
-printf '%s' "$build" | grep -qE '^[0-9]+$' && pass "build number $build, version $(cfg MARKETING_VERSION)" || fail "CURRENT_PROJECT_VERSION must be an integer, got '$build'"
+printf '%s' "$build" | grep -qE '^[0-9]+$' && pass "build number $build, version $(cfg MARKETING_VERSION) (from git tags)" || fail "CURRENT_PROJECT_VERSION must be an integer, got '$build'"
 
 echo "== Signing prerequisites (hand-made by the account holder; see docs/signing.md) =="
 ids="$(security find-identity -v -p codesigning 2>/dev/null || true)"

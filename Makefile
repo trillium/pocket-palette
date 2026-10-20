@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 SCRIPT_FILES := $(wildcard scripts/*.sh) $(wildcard .githooks/*)
 
-.PHONY: help doctor generate build device-compile test archive archive-unsigned upload bump check lint shell secrets hooks clean
+.PHONY: help doctor generate build device-compile test archive archive-unsigned upload version release test-version check lint shell secrets hooks clean
 help: ## list targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | sed -E 's/:.*## /\t/'
 
@@ -15,8 +15,12 @@ device-compile: ## iphoneos-SDK compile check, signing disabled
 	scripts/build.sh --device
 test: ## unit tests on an iOS simulator
 	scripts/test.sh
-bump: ## increment the build number (BUILD=N sets it)
-	scripts/bump-build.sh $(if $(BUILD),--set $(BUILD))
+version: ## print the version derived from git tags
+	@scripts/version.sh --full; scripts/version.sh
+release: ## cut a release: make release LEVEL=major|minor|patch (see docs/versioning.md)
+	scripts/release.sh $(LEVEL)
+test-version: ## unit tests for scripts/version.sh
+	scripts/test-version.sh
 archive: ## signed release archive (needs Apple signing; see docs/signing.md)
 	scripts/archive.sh
 archive-unsigned: ## unsigned archive: proves it compiles, cannot be uploaded
@@ -24,7 +28,7 @@ archive-unsigned: ## unsigned archive: proves it compiles, cannot be uploaded
 upload: ## TestFlight upload; DRY RUN unless CONFIRM=1
 	CONFIRM_UPLOAD=$(if $(CONFIRM),1,0) scripts/upload.sh
 
-check: shell lint secrets demo-engine-test test ## the single green gate; must pass at every commit
+check: shell lint secrets test-version demo-engine-test test ## the single green gate; must pass at every commit
 shell: ## syntax + shellcheck
 	@for f in $(SCRIPT_FILES); do bash -n "$$f" || exit 1; done
 	shellcheck -x $(SCRIPT_FILES)

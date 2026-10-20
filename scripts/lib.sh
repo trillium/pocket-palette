@@ -10,7 +10,7 @@ BUILD_DIR="${BUILD_DIR:-$ROOT/build}"
 # environment variable of the same name (so `make archive DEVELOPMENT_TEAM=ABCDE12345` works).
 cfg() {
   local key="$1" val="" f line
-  for f in "$CONFIG_DIR/Base.xcconfig" "$CONFIG_DIR/Local.xcconfig"; do
+  for f in "$CONFIG_DIR/Base.xcconfig" "$CONFIG_DIR/Version.xcconfig" "$CONFIG_DIR/Local.xcconfig"; do
     [ -f "$f" ] || continue
     line="$(grep -E "^[[:space:]]*${key}[[:space:]]*=" "$f" | tail -1 || true)"
     [ -n "$line" ] && val="$(printf '%s' "$line" | sed -E 's/^[^=]*=[[:space:]]*//; s/[[:space:]]*(\/\/.*)?$//')"
@@ -34,6 +34,7 @@ require_tool() { command -v "$1" >/dev/null 2>&1 || die "required tool not found
 
 generate_project() {
   require_tool xcodegen "brew install xcodegen"
+  "$ROOT/scripts/version.sh" --write  # stamp every build from git tags; no hand edits
   (cd "$ROOT" && xcodegen generate --quiet)
 }
 

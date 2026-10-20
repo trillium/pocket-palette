@@ -16,7 +16,7 @@ Legend: **[HAND]** only the Apple account holder can do it (no script can or sho
 
 ### C. Every build
 11. **[SCRIPT]** `make doctor SIGNING=1` must show no FAIL lines.
-12. **[SCRIPT]** `make bump` (new build number), `make archive` (signed release archive).
+12. **[SCRIPT]** `make archive` (version and build number are stamped from git tags; see `docs/versioning.md`) (signed release archive).
 13. **[SCRIPT]** `make upload` first: a dry run that prints exactly what would be sent. Then `make upload CONFIRM=1` to send for real.
 14. **[HAND]** Wait for processing (a few minutes). In App Store Connect > your app > TestFlight, answer the compliance prompt if shown (the template already declares `ITSAppUsesNonExemptEncryption = NO`).
 15. **[HAND]** First build only: add **Internal Testing** testers (people with an App Store Connect role) and install via the TestFlight app. No App Review is needed for internal testing. External testers need Beta App Review and `TESTFLIGHT_INTERNAL_ONLY=0`.
