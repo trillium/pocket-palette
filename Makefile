@@ -8,6 +8,7 @@ help: ## list targets
 doctor: ## check Xcode, tools, identity, signing prerequisites (SIGNING=1 makes signing items fatal)
 	scripts/doctor.sh $(if $(SIGNING),--signing)
 generate: ## generate the .xcodeproj from project.yml
+	scripts/version.sh --write
 	xcodegen generate
 build: ## simulator build, no signing
 	scripts/build.sh
