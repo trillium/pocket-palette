@@ -24,7 +24,7 @@ archive-unsigned: ## unsigned archive: proves it compiles, cannot be uploaded
 upload: ## TestFlight upload; DRY RUN unless CONFIRM=1
 	CONFIRM_UPLOAD=$(if $(CONFIRM),1,0) scripts/upload.sh
 
-check: shell lint secrets test ## the single green gate; must pass at every commit
+check: shell lint secrets demo-engine-test test ## the single green gate; must pass at every commit
 shell: ## syntax + shellcheck
 	@for f in $(SCRIPT_FILES); do bash -n "$$f" || exit 1; done
 	shellcheck -x $(SCRIPT_FILES)
@@ -32,6 +32,10 @@ lint: ## swiftlint, warnings are errors
 	swiftlint lint --strict --quiet
 secrets: ## block signing material and credentials in tracked files
 	scripts/check-secrets.sh --tracked
+demo-engine: ## run the reference Mac engine (HOST=<tailnet ip> PORT=7777 DRY_RUN=1); see tools/demo-engine/README.md
+	python3 tools/demo-engine/engine.py --host $(or $(HOST),127.0.0.1) --port $(or $(PORT),7777) $(if $(DRY_RUN),--dry-run)
+demo-engine-test: ## unit tests for the reference engine
+	python3 -m unittest discover -s tools/demo-engine -q
 hooks: ## enable .githooks for this clone
 	git config core.hooksPath .githooks
 clean:
