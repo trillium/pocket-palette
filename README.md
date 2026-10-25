@@ -24,6 +24,15 @@ Two apps (runbook rules 1, 2, 4): stable `com.trillium.pocketpalette` and beta `
 
 Both installs append a line to `~/.ios-install-ledger.tsv` (`LEDGER=` overrides): time, device, bundle id, commit, build, gate pass. Both need signing, and the `.beta` ids (app, widget and App Group) registered by hand (`docs/day-one-checklist.md`).
 
+## Phone sessions
+
+Every device session goes through one wrapper (runbooks-84o rule 5): `make phone-session CMD='make beta'`, or `scripts/phone-session.sh <command...>`. It guarantees the stable app is not left changed:
+- It takes the lock `~/.fm-phone-lock` (a directory holding `pid`, `started`, `command`; one phone, one lock across all apps). A live holder makes it refuse and say who holds it; a dead holder, or one older than `PHONE_SESSION_TIMEOUT` (default `30m`; seconds or `Ns`/`Nm`/`Nh`), is reported and reclaimed.
+- It records the installed apps (`xcrun devicectl device info apps`), runs the command under a watchdog (killed at the timeout, status 124), and on exit, INT, TERM or timeout runs the restore check and releases the lock. The exit status is the command's.
+- Restore check: the last known good stable build is the newest `~/.ios-install-ledger.tsv` line for the stable bundle id (never `.beta`) with gate pass yes. If the installed stable build differs, the kept ship-gated artifact (`OTA_DIR/builds/<id>/PocketPalette.ipa` with `meta.json` `pass: true`; `OTA_DIR` defaults to `~/ota/pocketpalette`) is reinstalled with `devicectl`, verified with a second apps listing, and a ledger line with note `restore` is appended. With no kept artifact for that commit it says so and installs nothing. Beta is never touched.
+- Phone locked or offline: it prints "phone is locked or offline; stable app could not be verified or restored, will retry", writes `~/.fm-phone-restore-pending` (bundle id, known-good commit and build, device, time) and exits non-zero. The next run with the marker present (or after reclaiming a stale lock) retries the restore before running anything, and refuses to run the command while the stable app is unverified.
+- Env: `DEVICE_ID`, `PHONE_SESSION_TIMEOUT`, `PHONE_LOCK`, `PHONE_RESTORE_MARKER`, `OTA_DIR`, `INSTALL_LEDGER` (`LEDGER=` on make). Test: `make phone-session-test` (in `make check`).
+
 ## Network trust
 There is no token. The app expects to reach the Mac over a private network (for example a Tailscale tailnet), and App Transport Security permits plain http only to `*.ts.net` hosts. Do not expose the engine module to the public internet.
 
