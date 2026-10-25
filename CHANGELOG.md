@@ -5,6 +5,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ## [Unreleased]
 
 ### Added
+- Phone sessions (runbooks-84o rule 5): `scripts/phone-session.sh` / `make phone-session CMD='...'` runs a device command under `~/.fm-phone-lock`, records the installed apps, and on exit, INT, TERM or timeout reinstalls the last known good stable build if it changed, verifying with `devicectl device info apps`; an unreachable phone writes `~/.fm-phone-restore-pending` and the next session retries first. Tested with a stubbed `xcrun` (`scripts/test-phone-session.sh`, `make phone-session-test`).
 - Beta flavour (runbook rule 1): `Config/Beta.xcconfig`, build configuration `Beta`, scheme "PocketPalette Beta" covering the app and its widget, bundle id `com.trillium.pocketpalette.beta` (widget `.beta.widget`), its own App Group and widget link scheme (`pocketpalette-beta`), display name "PocketPalette β", a `BETA` compile condition and a β BETA icon; the default scheme stays stable.
 - `make beta` and `make stable-install` (rules 2 and 4), via `scripts/install.sh`: install with `xcrun devicectl` on `DEVICE_ID`; the stable install refuses without a `make ship-gate` pass for the clean HEAD; each install appends a line to the `LEDGER`.
 - `make ship-gate` (`scripts/ship-gate.sh`, `scripts/smoke.sh`): unmerged-branch check (`make unmerged`), tip and clean tree, `make check`, then a simulator smoke run of the built app, which prints `FMSelfCheck: ok` under `-FMSelfCheck 1`.
