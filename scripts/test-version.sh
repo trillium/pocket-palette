@@ -31,5 +31,6 @@ CURRENT_PROJECT_VERSION = 3" "$("$here/version.sh")"
 if grep -q '^MARKETING_VERSION = 1.0.0$' "$tmp/Config/Version.xcconfig"; then echo "ok   write"; else echo "FAIL write"; fails=$((fails + 1)); fi
 git -C "$tmp" tag v1.0.1-rc1 2>/dev/null; git -C "$tmp" tag -d v1.0.1-rc1 >/dev/null
 expect "non-release tags ignored" "1.0.0" "$("$here/version.sh" --marketing)"
+if make -n -C "$here/.." generate | grep -q 'scripts/version.sh --write'; then echo "ok   make generate writes Version.xcconfig"; else echo "FAIL make generate does not write Version.xcconfig"; fails=$((fails + 1)); fi
 [ "$fails" = 0 ] || { echo "$fails failure(s)"; exit 1; }
 echo "version tests ok"
