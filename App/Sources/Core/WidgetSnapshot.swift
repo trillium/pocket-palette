@@ -39,9 +39,22 @@ struct WidgetSnapshot: Codable, Equatable, Sendable {
     )
 }
 
-/// The `pocketpalette://command?id=...` links the widget opens.
+/// The App Group and URL scheme this build uses. Both come from the Info.plist (APP_GROUP_ID and PALETTE_URL_SCHEME in
+/// Config/*.xcconfig) so the beta app and its widget use their own and never touch the stable app's data or links.
+enum SharedIdentity {
+    static func value(_ key: String, fallback: String, bundle: Bundle = .main) -> String {
+        let value = bundle.object(forInfoDictionaryKey: key) as? String
+        guard let value, !value.isEmpty, !value.hasPrefix("$(") else { return fallback }
+        return value
+    }
+
+    static var appGroup: String { value("PaletteAppGroup", fallback: "group.com.trillium.pocketpalette") }
+    static var urlScheme: String { value("PaletteURLScheme", fallback: "pocketpalette") }
+}
+
+/// The `pocketpalette://command?id=...` links the widget opens (`pocketpalette-beta://` in the beta app).
 enum WidgetLink {
-    static let scheme = "pocketpalette"
+    static var scheme: String { SharedIdentity.urlScheme }
 
     static func url(forCommand id: String) -> URL {
         var parts = URLComponents()
@@ -63,7 +76,7 @@ enum WidgetLink {
 /// The snapshot as one JSON file in the App Group container. Unsigned builds have no container: both sides
 /// then see nil / do nothing, and the widget falls back to its empty state.
 struct WidgetSnapshotStore: Sendable {
-    static let appGroup = "group.com.trillium.pocketpalette"
+    static var appGroup: String { SharedIdentity.appGroup }
     let fileURL: URL?
 
     static var shared: WidgetSnapshotStore {

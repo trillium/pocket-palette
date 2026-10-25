@@ -1,0 +1,22 @@
+// Beta flavour: the same app under a sibling bundle id so a beta and the stable build live side by side on one
+// phone (runbook rule 1). Selected by the "Beta" build configuration (scheme "PocketPalette Beta"), which builds the app
+// and its widget extension.
+// Everything else (team, version, build number, Local.xcconfig overrides) is inherited from Base.xcconfig.
+// The .beta bundle ids (app, and the widget as .beta.widget) and the App Group group.<id>.beta must be registered by the
+// account holder (docs/day-one-checklist.md) before they can be signed.
+#include "Base.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = $(inherited).beta
+DISPLAY_NAME = $(inherited) β
+PRODUCT_NAME = $(DISPLAY_NAME)
+// The app target pins its Swift module back to PocketPalette, and the widget its product name, in project.yml
+// (an xcconfig-wide value would be inherited by every target and collide).
+// The app and its widget share an App Group; beta gets its own so the two apps never share data (the beta widget talks
+// to the beta app). Stays equal to group.<beta bundle id> (scripts/test-beta.sh).
+APP_GROUP_ID = $(inherited).beta
+// The widget opens <scheme>://command?id=...; iOS lets two apps claim one scheme, so the beta answers to its own.
+PALETTE_URL_SCHEME = pocketpalette-beta
+
+// `#if BETA` in Swift; BETA=1 for C/ObjC.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) BETA
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) BETA=1

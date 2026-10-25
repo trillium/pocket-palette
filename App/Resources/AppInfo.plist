@@ -6,10 +6,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.trillium.pocketpalette</string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>pocketpalette</string>
+				<string>$(PALETTE_URL_SCHEME)</string>
 			</array>
 		</dict>
 	</array>
@@ -26,6 +26,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>PaletteAppGroup</key>
+	<string>$(APP_GROUP_ID)</string>
+	<key>PaletteURLScheme</key>
+	<string>$(PALETTE_URL_SCHEME)</string>
 	<key>PaletteServerURL</key>
 	<string>http://$(PALETTE_SERVER_HOST)</string>
 </dict>
