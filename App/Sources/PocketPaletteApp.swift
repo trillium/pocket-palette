@@ -8,6 +8,8 @@ struct PocketPaletteApp: App {
         widget: AppGroupWidgetPublisher()
     )
 
+    init() { SelfCheck.runIfRequested() }
+
     var body: some Scene {
         WindowGroup {
             ContentView(model: model)

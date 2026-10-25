@@ -67,3 +67,9 @@ archive_is_signed() {
   id="$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:SigningIdentity' "$ARCHIVE_PATH/Info.plist" 2>/dev/null || true)"
   [ -n "$id" ]
 }
+
+# Beta flavour (Config/Beta.xcconfig, scheme "<App> Beta") and the device install paths (scripts/install.sh).
+BETA_SCHEME="$APP_NAME Beta"
+BETA_BUNDLE_ID="$BUNDLE_ID.beta"
+SHIP_PASS_DIR="${SHIP_PASS_DIR:-$BUILD_DIR/ship-pass}"
+INSTALL_LEDGER="${INSTALL_LEDGER:-$HOME/.ios-install-ledger.tsv}"

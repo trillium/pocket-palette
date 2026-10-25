@@ -1,6 +1,8 @@
 // Copy to Config/Local.xcconfig (gitignored) to override identity on this machine only.
 // DEVELOPMENT_TEAM = ABCDE12345
 // PRODUCT_BUNDLE_IDENTIFIER = com.yourname.myapp.dev
+// APP_GROUP_ID = group.com.yourname.myapp.dev   (keep equal to group.<bundle id>; the beta adds .beta to both)
+// DEVICE_ID = 00008110-000000000000001E   (make beta / make stable-install; list with: xcrun devicectl list devices)
 // Prefill the feed server at build time: host:port only, no scheme (in an xcconfig "//" starts a comment).
 // The app turns it into http://<host:port>; plain http is allowed for *.ts.net only (ATS exception).
 // PALETTE_SERVER_HOST = macbook.your-tailnet.ts.net:7399

@@ -5,6 +5,11 @@
 APP_NAME = PocketPalette
 DISPLAY_NAME = PocketPalette
 PRODUCT_BUNDLE_IDENTIFIER = com.trillium.pocketpalette
+// The App Group the app and its widget share (entitlements, and PaletteAppGroup in both Info.plists), and the URL scheme
+// the widget opens the app with. Beta overrides both (Config/Beta.xcconfig). If Local.xcconfig changes the bundle id,
+// change APP_GROUP_ID to group.<that id> there too.
+APP_GROUP_ID = group.com.trillium.pocketpalette
+PALETTE_URL_SCHEME = pocketpalette
 
 // Version is derived from git tags, never hand-edited (docs/versioning.md). These are only fallbacks for a
 // checkout with no git history; `make generate` writes Config/Version.xcconfig (gitignored), which overrides them.
