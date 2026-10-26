@@ -33,8 +33,13 @@ Every device session goes through one wrapper (runbooks-84o rule 5): `make phone
 - Phone locked or offline: it prints "phone is locked or offline; stable app could not be verified or restored, will retry", writes `~/.fm-phone-restore-pending` (bundle id, known-good commit and build, device, time) and exits non-zero. The next run with the marker present (or after reclaiming a stale lock) retries the restore before running anything, and refuses to run the command while the stable app is unverified.
 - Env: `DEVICE_ID`, `PHONE_SESSION_TIMEOUT`, `PHONE_LOCK`, `PHONE_RESTORE_MARKER`, `OTA_DIR`, `INSTALL_LEDGER` (`LEDGER=` on make). Test: `make phone-session-test` (in `make check`).
 
+## Minimum-good-version check
+At launch and each time it comes to the front the app reads a small JSON file (`MIN_VERSION_URL` in `Config/Base.xcconfig`, built from `SIDE_HOST`, which you set in the gitignored `Config/Local.xcconfig`; Info.plist key `MinVersionURL`). If its own build is below `min_build` or listed in `broken_builds`, it shows "This build is broken. Install the stable app." instead of the normal UI. The check fails open: an unreachable file, a bad status, a parse error, a 3 s timeout or no network all mean "no restriction". The beta id `<id>.beta` looks up the stable id's entry. Set `MIN_VERSION_URL` empty (for example in `Config/Local.xcconfig`) to switch the check off.
+- `-FMForceBroken` (launch argument) forces the broken screen; `scripts/smoke.sh` (the ship gate) relaunches with it and requires the `FMBrokenScreen: shown` line.
+- `App/Sources/MinVersion/` is vendored from parrot-kit `MinVersionPolicy` and `BrokenBuildScreen` (main 7675044, MIT, access made internal); see `THIRD_PARTY_NOTICES.md`.
+
 ## Network trust
-There is no token. The app expects to reach the Mac over a private network (for example a Tailscale tailnet), and App Transport Security permits plain http only to `*.ts.net` hosts. Do not expose the engine module to the public internet.
+There is no token. The app expects to reach the Mac over a private network (for example a Tailscale tailnet), and App Transport Security permits plain http only to `*.ts.net` hosts (plus a single-host entry for `SIDE_HOST`, the min-version file's host); there is no blanket `NSAllowsArbitraryLoads`. Do not expose the engine module to the public internet.
 
 ## License
 MIT, see `LICENSE`. Third-party notices: `THIRD_PARTY_NOTICES.md`.

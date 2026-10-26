@@ -6,3 +6,7 @@
 // Prefill the feed server at build time: host:port only, no scheme (in an xcconfig "//" starts a comment).
 // The app turns it into http://<host:port>; plain http is allowed for *.ts.net only (ATS exception).
 // PALETTE_SERVER_HOST = macbook.your-tailnet.ts.net:7399
+// Host that serves the minimum-good-version file (http://$(SIDE_HOST):4380/min-version.json). The same value becomes the
+// single-host App Transport Security exception (insecure http loads for that host only). Without it the check hits an unreachable
+// placeholder and fails open.
+// SIDE_HOST = example.ts.net

@@ -3,7 +3,13 @@
 PocketPalette's own code is MIT (see `LICENSE`).
 
 ## Bundled today
-Nothing. The app links only Apple system frameworks. It ships no third-party code, model weights, or audio.
+Vendored source (MIT), compiled into the app:
+
+| Code | License | Source |
+|---|---|---|
+| `App/Sources/MinVersion/MinVersionPolicy.swift`, `BrokenBuildScreen.swift` | MIT, Copyright (c) 2026 Trillium Smith | parrot-kit `KitCore.MinVersionPolicy` and `ParrotKitUI.BrokenBuildScreen` (main 7675044), access made internal |
+
+The app otherwise links only Apple system frameworks. It ships no other third-party code, model weights, or audio.
 
 ## Build and test tooling (not shipped in the app)
 | Tool | License | Use |
