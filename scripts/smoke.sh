@@ -10,6 +10,7 @@
 #   - Start any fake dependency (loopback receiver, stub server) before the launch and kill it in `cleanup`.
 # Contract with ship-gate.sh: exit 0 only on success; if $SMOKE_RESULT names a file, write one JSON object into it
 # (ship-gate stores it as .smoke in the pass file; keep `selfCheckPassed` and `commit`).
+# After the self-check it also relaunches with `-FMForceBroken` and requires the broken-build screen to render (min-version check).
 # SMOKE_TIMEOUT (seconds, default 90) bounds the wait for the app. Needs: xcodebuild, xcrun simctl, jq.
 set -euo pipefail
 # shellcheck source-path=SCRIPTDIR source=lib.sh
@@ -62,6 +63,19 @@ line="$(grep '^FMSelfCheck: ' "$out" | head -1 || true)"
 case "$line" in "FMSelfCheck: ok $BUNDLE_ID "*) ;; *) die "smoke: self-check failed: $line" ;; esac
 echo "smoke: self-check ok ($line)"
 
+# `-FMForceBroken` must swap in the broken-build screen (App/Sources/RootView.swift prints a line once it renders).
+kill "$launcher_pid" 2>/dev/null || true
+launcher_pid=""
+xcrun simctl terminate "$udid" "$BUNDLE_ID" >/dev/null 2>&1 || true
+forced="$work/forced.out"
+xcrun simctl launch --console "$udid" "$BUNDLE_ID" -FMForceBroken >"$forced" 2>&1 &
+launcher_pid=$!
+waited=0
+until grep -q '^FMBrokenScreen: ' "$forced" 2>/dev/null || [ "$waited" -ge "$SMOKE_TIMEOUT" ]; do sleep 1; waited=$((waited + 1)); done
+broken_line="$(grep '^FMBrokenScreen: ' "$forced" | head -1 || true)"
+case "$broken_line" in "FMBrokenScreen: shown $BUNDLE_ID "*) ;; *) die "smoke: -FMForceBroken did not render the broken-build screen within ${SMOKE_TIMEOUT}s (output: $(head -c 400 "$forced"))" ;; esac
+echo "smoke: broken-build screen renders under -FMForceBroken ($broken_line)"
+
 if [ -n "${SMOKE_RESULT:-}" ]; then
-  jq -n --arg commit "$short" --arg line "$line" '{selfCheckPassed: true, commit: $commit, selfCheckLine: $line}' >"$SMOKE_RESULT"
+  jq -n --arg commit "$short" --arg line "$line" '{selfCheckPassed: true, brokenScreenRendered: true, commit: $commit, selfCheckLine: $line}' >"$SMOKE_RESULT"
 fi

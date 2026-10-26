@@ -13,10 +13,18 @@
 			</array>
 		</dict>
 	</array>
+	<!-- Empty MIN_VERSION_URL switches the minimum-good-version check off. -->
+	<key>MinVersionURL</key>
+	<string>$(MIN_VERSION_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>SIDE_HOST_NAME</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 			<key>ts.net</key>
 			<dict>
 				<key>NSIncludesSubdomains</key>

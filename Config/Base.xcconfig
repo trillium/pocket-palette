@@ -21,4 +21,12 @@ CURRENT_PROJECT_VERSION = 1
 // Set it in the gitignored Config/Local.xcconfig, never here. Empty = the app starts "Not set up".
 PALETTE_SERVER_HOST =
 
+// Minimum-good-version check: the app reads this small file at launch and each time it comes to the front, and shows a
+// "broken build" screen if its own build is below the minimum or listed as broken. It fails open: an unreachable file never
+// blocks the app. Empty disables the check. "//" starts an xcconfig comment, so the URL's slashes are split with $().
+// The host serving it is set per machine: SIDE_HOST in the gitignored Config/Local.xcconfig (see Local.xcconfig.example). The same
+// setting feeds the App Transport Security exception in Info.plist. The placeholder default is unreachable, which fails open.
+SIDE_HOST = example.ts.net
+MIN_VERSION_URL = http:/$()/$(SIDE_HOST):4380/min-version.json
+
 #include? "Local.xcconfig"
