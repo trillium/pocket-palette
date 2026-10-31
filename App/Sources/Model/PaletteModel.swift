@@ -104,6 +104,7 @@ final class PaletteModel {
     func reloadConfiguration() {
         guard let url = settings.load().baseURL else {
             api = nil
+            serverKey = ""
             connection = .unconfigured
             state = nil
             return
@@ -133,8 +134,11 @@ final class PaletteModel {
     @discardableResult
     func pollOnce() async -> Bool {
         guard let api else { return false }
+        let server = serverKey
         do {
             let fresh = try await api.state()
+            // The server was changed (or cleared) while the request was in flight: this answer belongs to the old one.
+            guard server == serverKey else { return false }
             let appChanged = fresh.app.name != state?.app.name
             state = fresh
             if appChanged { publishWidget() }
@@ -145,25 +149,29 @@ final class PaletteModel {
         } catch is CancellationError {
             return false
         } catch {
-            fail(with: error)
+            fail(with: error, from: server)
             return false
         }
     }
 
     func refreshCommands() async {
         guard let api else { return }
+        let server = serverKey
         do {
-            switch try await api.commands(knownRev: commandsRev) {
+            let fetched = try await api.commands(knownRev: commandsRev)
+            // A list from the old server must not be shown for, or cached under, the new one.
+            guard server == serverKey else { return }
+            switch fetched {
             case .notModified:
                 break
             case .updated(let list):
                 apply(commands: list.commands, rev: list.commandsRev)
-                cache.save(CachedCommands(server: serverKey, rev: list.commandsRev, commands: list.commands))
+                cache.save(CachedCommands(server: server, rev: list.commandsRev, commands: list.commands))
             }
         } catch is CancellationError {
             return
         } catch {
-            fail(with: error)
+            fail(with: error, from: server)
         }
     }
 
@@ -198,9 +206,10 @@ final class PaletteModel {
         if dryRun { return stageDryRun(command, phrase: phrase, api: api) }
         isExecuting = true
         defer { isExecuting = false }
+        let server = serverKey
         do {
             let result = try await api.inject(phrase: phrase)
-            connection = .online
+            if server == serverKey { connection = .online }
             let ran = result.rules.isEmpty ? phrase : result.rules.joined(separator: ", ")
             show("Ran \u{201C}\(ran)\u{201D}", isError: false)
             if let command { recordRun(command) }
@@ -208,7 +217,7 @@ final class PaletteModel {
         } catch is CancellationError {
             return false
         } catch {
-            fail(with: error)
+            fail(with: error, from: server)
             return false
         }
     }
@@ -261,17 +270,21 @@ final class PaletteModel {
         if publish { publishWidget() }
     }
 
-    private func fail(with error: Error) {
+    /// `server` is the `serverKey` the failed request was made for. After a switch the error says nothing about the new server,
+    /// so it is shown but leaves the connection state alone.
+    private func fail(with error: Error, from server: String? = nil) {
         let mapped = error as? PaletteError ?? .invalidResponse
-        switch mapped {
-        case .offline:
-            connection = .offline
-            state = nil
-        case .unauthorized:
-            connection = .unauthorized
-            state = nil
-        default:
-            break
+        if server == nil || server == serverKey {
+            switch mapped {
+            case .offline:
+                connection = .offline
+                state = nil
+            case .unauthorized:
+                connection = .unauthorized
+                state = nil
+            default:
+                break
+            }
         }
         show(mapped.message, isError: true)
     }
@@ -299,10 +312,11 @@ extension PaletteModel {
     /// Dry-run Confirm: sends the staged phrase with `dry_run=1`, so the feed reports what would run and runs nothing.
     func confirmDryRun() async {
         guard dryRun, let preview = dryRunPreview, let api, dryRunOutcome?.previewID != preview.id else { return }
+        let server = serverKey
         do {
             let result = try await api.inject(phrase: preview.phrase, dryRun: true)
             guard dryRunPreview?.id == preview.id else { return }
-            connection = .online
+            if server == serverKey { connection = .online }
             dryRunOutcome = DryRunOutcome(previewID: preview.id, wouldRun: result.rules, error: nil)
             if let command = preview.command { recordRun(command) }
             show("Dry run: nothing was executed", isError: false)
@@ -313,7 +327,7 @@ extension PaletteModel {
             if dryRunPreview?.id == preview.id {
                 dryRunOutcome = DryRunOutcome(previewID: preview.id, wouldRun: [], error: mapped.message)
             }
-            fail(with: error)
+            fail(with: error, from: server)
         }
     }
 
