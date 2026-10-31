@@ -42,6 +42,40 @@ final class FakeTransport: HTTPTransport, @unchecked Sendable {
     }
 }
 
+/// Holds the first request until `release()`, so a test can change state while a request is in flight.
+final class GatedTransport: HTTPTransport, @unchecked Sendable {
+    private let inner: FakeTransport
+    private let arrived = AsyncStream<Void>.makeStream()
+    private let gate = AsyncStream<Void>.makeStream()
+    private let lock = NSLock()
+    private var gated = false
+
+    init(_ inner: FakeTransport) {
+        self.inner = inner
+    }
+
+    /// Returns once a request is waiting at the gate.
+    func waitForRequest() async {
+        for await _ in arrived.stream { return }
+    }
+
+    func release() {
+        gate.continuation.yield()
+    }
+
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        let first = lock.withLock { () -> Bool in
+            defer { gated = true }
+            return !gated
+        }
+        if first {
+            arrived.continuation.yield()
+            for await _ in gate.stream { break }
+        }
+        return try await inner.send(request)
+    }
+}
+
 final class FakeSettingsStore: SettingsStore, @unchecked Sendable {
     private let lock = NSLock()
     private var settings: ServerSettings

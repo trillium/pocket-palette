@@ -174,6 +174,84 @@ final class PaletteModelTests: XCTestCase {
         }
     }
 
+    func testStateAnswerFromTheOldServerIsDroppedAfterTheServerChanges() async {
+        let gated = GatedTransport(FakeTransport([.http(200, Fixture.stateJSON, [:]), .http(200, Fixture.commandsJSON, [:])]))
+        let settings = FakeSettingsStore(server)
+        let cache = FakeCache()
+        let model = PaletteModel(
+            settings: settings, cache: cache, defaults: isolatedDefaults(),
+            makeAPI: { PaletteAPI(baseURL: $0, transport: gated) }
+        )
+        let poll = Task { await model.pollOnce() }
+        await gated.waitForRequest()
+        settings.save(ServerSettings(baseURLText: "http://other.tail0.ts.net:7399"))
+        model.reloadConfiguration()
+        gated.release()
+        let applied = await poll.value
+        XCTAssertFalse(applied)
+        XCTAssertEqual(model.connection, .connecting, "the old server's answer says nothing about the new one")
+        XCTAssertNil(model.state)
+        XCTAssertEqual(model.commandCount, 0)
+        XCTAssertNil(cache.saved, "the old server's list is never cached under the new one")
+    }
+
+    func testCommandListFromTheOldServerIsNeitherShownNorCachedAfterTheServerChanges() async {
+        let gated = GatedTransport(FakeTransport([.http(200, Fixture.commandsJSON, [:])]))
+        let settings = FakeSettingsStore(server)
+        let cache = FakeCache()
+        let model = PaletteModel(
+            settings: settings, cache: cache, defaults: isolatedDefaults(),
+            makeAPI: { PaletteAPI(baseURL: $0, transport: gated) }
+        )
+        let refresh = Task { await model.refreshCommands() }
+        await gated.waitForRequest()
+        settings.save(ServerSettings(baseURLText: "http://other.tail0.ts.net:7399"))
+        model.reloadConfiguration()
+        gated.release()
+        await refresh.value
+        XCTAssertEqual(model.commandCount, 0)
+        XCTAssertNil(cache.saved)
+    }
+
+    func testOfflineErrorFromTheOldServerDoesNotMarkTheNewServerOffline() async {
+        let gated = GatedTransport(FakeTransport([.failure(URLError(.cannotConnectToHost))]))
+        let settings = FakeSettingsStore(server)
+        let model = PaletteModel(
+            settings: settings, cache: FakeCache(), defaults: isolatedDefaults(),
+            makeAPI: { PaletteAPI(baseURL: $0, transport: gated) }
+        )
+        let poll = Task { await model.pollOnce() }
+        await gated.waitForRequest()
+        settings.save(ServerSettings(baseURLText: "http://other.tail0.ts.net:7399"))
+        model.reloadConfiguration()
+        gated.release()
+        _ = await poll.value
+        XCTAssertEqual(model.connection, .connecting)
+    }
+
+    func testAnswerArrivingAfterTheServerIsClearedDoesNotGoOnline() async {
+        let gated = GatedTransport(FakeTransport([.http(200, Fixture.stateJSON, [:])]))
+        let settings = FakeSettingsStore(server)
+        let model = PaletteModel(
+            settings: settings, cache: FakeCache(), defaults: isolatedDefaults(),
+            makeAPI: { PaletteAPI(baseURL: $0, transport: gated) }
+        )
+        let poll = Task { await model.pollOnce() }
+        await gated.waitForRequest()
+        settings.save(ServerSettings(baseURLText: ""))
+        model.reloadConfiguration()
+        gated.release()
+        _ = await poll.value
+        XCTAssertEqual(model.connection, .unconfigured)
+        XCTAssertNil(model.state)
+    }
+
+    private func isolatedDefaults() -> UserDefaults {
+        let suite = "palette-model-tests-\(UUID().uuidString)"
+        addTeardownBlock { UserDefaults().removePersistentDomain(forName: suite) }
+        return UserDefaults(suiteName: suite) ?? UserDefaults()
+    }
+
     func testTemplateRuleNeedsAnExplicitPhrase() async {
         let transport = FakeTransport()
         let (model, _) = makeModel(transport)
