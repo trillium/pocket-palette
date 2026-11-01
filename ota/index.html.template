@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>__TITLE__ install</title>
+	<style>
+		body { font-family: -apple-system, sans-serif; max-width: 32rem; margin: 4rem auto; padding: 0 1.5rem; text-align: center; }
+		a.install { display: inline-block; margin-top: 1.5rem; padding: 0.9rem 2rem; background: #007aff; color: #fff; text-decoration: none; border-radius: 0.7rem; font-size: 1.1rem; }
+		.rollback-list { margin-top: 2.5rem; text-align: left; }
+		.rollback-list li { margin-bottom: 0.8rem; font-size: 0.9rem; }
+		a.rollback { display: block; color: #b00020; }
+		p.version { color: #666; font-size: 0.9rem; }
+	</style>
+</head>
+<body>
+	<h1>__TITLE__</h1>
+	<p class="version">version __VERSION_LABEL__ &middot; build __BUNDLE_VERSION__ &middot; passed the ship gate __PASSED_AT__</p>
+	<p>Open this page in Safari on your iPhone (Tailscale connected), then tap install.</p>
+	<a class="install" href="__INSTALL_URL__">Install __TITLE__</a>
+	<div class="rollback-list">__ROLLBACK__</div>
+</body>
+</html>

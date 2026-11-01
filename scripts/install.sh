@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# make beta / make stable-install: build for the connected iPhone and install it with `xcrun devicectl`.
+# make beta / make stable-install: DEV/CI TOOLING, NOT THE PHONE INSTALL PATH. The captain's iPhone is installed only by
+# `make ship-gate && make ota && make ota-serve` over Tailscale (docs/ota.md). This builds for a connected device and installs it
+# with `xcrun devicectl`, for simulator/CI/home-LAN development.
 #   install.sh beta     the "<App> Beta" scheme (bundle id <id>.beta); no gate, this is the daily-driver testing app.
 #   install.sh stable   the stable scheme and bundle id; REFUSES unless `make ship-gate` left
 #                       build/ship-pass/<HEAD sha>.json for exactly this commit on a clean tree (runbook rule 4).

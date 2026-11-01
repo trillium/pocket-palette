@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # make phone-session CMD='...': the one wrapper every device session goes through (runbooks-84o rule 5).
+# DEV TOOLING, NOT AN INSTALL PATH: the captain's phone is installed only by `make ota` over Tailscale (docs/ota.md).
 #   phone-session.sh <command...>
 # Takes the phone lock (mkdir $PHONE_LOCK, default ~/.fm-phone-lock, holding pid, start time and command), records the
 # installed apps (xcrun devicectl device info apps), runs the command under a watchdog (PHONE_SESSION_TIMEOUT, default
