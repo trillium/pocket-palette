@@ -79,12 +79,26 @@ done
 name="PocketPalette"; [ "$cfg" != Beta ] || name="PocketPalette β"
 mkdir -p "$dd/Build/Products/$cfg-iphoneos/$name.app"
 STUB
+# phone-reach: the lock must be held (phone-session) and it must be asked to wait 120s; STUB_REACH_FAIL = phone unreachable.
+cat >"$stubs/phone-reach" <<'STUB'
+#!/usr/bin/env bash
+echo "reach $* lock=$([ -d "$HOME/.fm-phone-lock" ] && echo held || echo free)" >>"$STUB_XCRUN_LOG"
+[ -z "${STUB_REACH_FAIL:-}" ] || { echo "phone-reach: no road to the phone" >&2; exit 1; }
+echo FAKE-DEVICE
+STUB
+# the session's apps listing reports the stable build the ledger last recorded, so the restore check is a no-op
 cat >"$stubs/xcrun" <<'STUB'
 #!/usr/bin/env bash
 echo "$*" >>"$STUB_XCRUN_LOG"
+if [ "$1 $2 $3 $4" = "devicectl device info apps" ]; then
+  while [ $# -gt 0 ]; do [ "$1" != --json-output ] || out="$2"; shift; done
+  b="$(awk -F'\t' '$3 == "com.trillium.pocketpalette" { l = $5 } END { print l }' "$INSTALL_LEDGER" 2>/dev/null || true)"
+  echo "{\"result\":{\"apps\":[{\"bundleIdentifier\":\"com.trillium.pocketpalette\",\"bundleVersion\":\"$b\"}]}}" >"$out"
+fi
 STUB
 chmod +x "$stubs"/*
-export STUB_XCRUN_LOG="$tmp/xcrun.log" INSTALL_LEDGER="$tmp/ledger.tsv" DEVICE_ID=FAKE-DEVICE DEVELOPMENT_TEAM=ABCDE12345
+export HOME="$tmp/home"; mkdir -p "$HOME"; unset DEVICE_ID
+export STUB_XCRUN_LOG="$tmp/xcrun.log" INSTALL_LEDGER="$tmp/ledger.tsv" DEVELOPMENT_TEAM=ABCDE12345
 : >"$STUB_XCRUN_LOG"
 inst() { (cd "$repo" && PATH="$stubs:$PATH" "$@" 2>&1); }
 
@@ -97,6 +111,10 @@ cp "$pass" "$repo/build/ship-pass/$head_sha.json"
 inst make stable-install LEDGER="$INSTALL_LEDGER" >/dev/null || fail "stable-install failed with a valid pass"
 grep -q 'devicectl device install app --device FAKE-DEVICE .*/Release-iphoneos/PocketPalette.app' "$STUB_XCRUN_LOG" \
   || fail "devicectl not called as expected: $(cat "$STUB_XCRUN_LOG")"
+grep -qx 'reach --wait 120 lock=held' "$STUB_XCRUN_LOG" || fail "phone-reach not run under the phone lock: $(cat "$STUB_XCRUN_LOG")"
+first_phone_call="$(grep -n 'reach\|devicectl' "$STUB_XCRUN_LOG" | head -1)"
+case "$first_phone_call" in *"reach --wait 120"*) ;; *) fail "a devicectl call came before phone-reach: $first_phone_call" ;; esac
+[ ! -d "$HOME/.fm-phone-lock" ] || fail "install left the phone lock behind"
 IFS=$'\t' read -r when dev bundle commit _ gatepass <"$INSTALL_LEDGER"
 [ "$dev" = FAKE-DEVICE ] && [ "$bundle" = com.trillium.pocketpalette ] && [ "$commit" = "$(g rev-parse --short HEAD)" ] \
   && [ "$gatepass" = yes ] && [[ "$when" == 20*Z ]] || fail "ledger line wrong: $(cat "$INSTALL_LEDGER")"
@@ -115,6 +133,10 @@ grep -q 'devicectl device install app --device FAKE-DEVICE .*/Beta-iphoneos/Pock
   || fail "beta devicectl call wrong: $(cat "$STUB_XCRUN_LOG")"
 IFS=$'\t' read -r _ _ bundle _ _ gatepass < <(tail -1 "$INSTALL_LEDGER")
 [ "$bundle" = com.trillium.pocketpalette.beta ] && [ "$gatepass" = no ] || fail "beta ledger line wrong: $(tail -1 "$INSTALL_LEDGER")"
-if out="$(inst env -u DEVICE_ID make beta LEDGER="$INSTALL_LEDGER")"; then fail "make beta ran without a device"; fi
-grep -qF "no device" <<<"$out" || fail "missing device not explained: $out"
+# phone unreachable: nothing is built or installed, the lock is released, the command fails
+: >"$STUB_XCRUN_LOG"; lines_before="$(wc -l <"$INSTALL_LEDGER")"
+if out="$(inst env STUB_REACH_FAIL=1 make beta LEDGER="$INSTALL_LEDGER")"; then fail "make beta ran with the phone unreachable"; fi
+grep -qF "phone-reach failed" <<<"$out" || fail "unreachable phone not explained: $out"
+! grep -q 'devicectl device install' "$STUB_XCRUN_LOG" || fail "installed on an unreachable phone"
+[ "$(wc -l <"$INSTALL_LEDGER")" = "$lines_before" ] && [ ! -d "$HOME/.fm-phone-lock" ] || fail "unreachable phone left a ledger line or the lock"
 echo "ship-gate test ok"

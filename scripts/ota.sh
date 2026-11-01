@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# make ota: build an ad-hoc-signed .ipa (app + widget) and publish it as an OTA (itms-services) install
+# make ota: NON-CAPTAIN FALLBACK. The captain's phone is installed by `make ship-gate && make stable-install` (automatic,
+# over Tailscale, no link, no tap); this is never his install path.
+# Build an ad-hoc-signed .ipa (app + widget) and publish it as an OTA (itms-services) install
 # package: manifest.plist + index.html + the .ipa, written to OTA_DIR (default ~/ota/pocketpalette). Follows
 # runbooks-c62 and mirrors ~/code/TinyKeyboard/ota-publish.sh. `make ota-serve` exposes OTA_DIR over tailnet-only
-# HTTPS; open the printed install page in Safari on the iPhone (Tailscale connected) and tap Install.
+# HTTPS for a tester's device. The kept builds are also what phone-session restores the stable app from.
 # It refuses to publish unless `make ship-gate` left a pass file for exactly this commit, and it keeps the last good
 # builds as a Rollback list (docs/ota.md). Needs: team 85PWBA3B59 in DEVELOPMENT_TEAM (Config/Local.xcconfig) and ota/exportOptions.plist,
 # its "Apple Development" identity in the keychain, the phone registered for the team, jq, and the tailscale CLI
