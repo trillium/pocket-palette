@@ -15,16 +15,22 @@ The phone does not know which automation engine runs on the Mac. It talks to a s
 3. `make test` runs the unit tests on a simulator. No Apple account needed.
 4. `make check` is the full gate: shell, lint, secrets, tests.
 
-To run on a device, copy `Config/Local.xcconfig.example` to `Config/Local.xcconfig` and set `DEVELOPMENT_TEAM`. Set `PALETTE_SERVER_HOST` there to prefill the Mac address, or enter it in Settings. TestFlight steps: `docs/day-one-checklist.md`; credentials: `docs/signing.md`.
+Copy `Config/Local.xcconfig.example` to `Config/Local.xcconfig` and set `DEVELOPMENT_TEAM`. Set `PALETTE_SERVER_HOST` there to prefill the Mac address, or enter it in Settings. TestFlight steps: `docs/day-one-checklist.md`; credentials: `docs/signing.md`.
+
+## Install on the iPhone (the only way: OTA over Tailscale)
+`make ship-gate`, then `make ota`, then `make ota-serve` (tailnet-only `tailscale serve --https=8782`, never Funnel). On the iPhone, with Tailscale connected, open the page `make ota` prints (`https://<this Mac>.hippo-tilapia.ts.net:8782/`) in Safari and tap Install. Full steps, rollback and prerequisites: [`docs/ota.md`](docs/ota.md). USB, Xcode Run, `devicectl` and "be on the home Wi-Fi" are not install paths.
 
 ## Beta and stable on one phone
-Two apps (runbook rules 1, 2, 4): stable `com.trillium.pocketpalette` and beta `com.trillium.pocketpalette.beta` ("PocketPalette β", orange β BETA icon, `#if BETA`), each with its own widget (`.widget` / `.beta.widget`), App Group and widget link scheme (`pocketpalette` / `pocketpalette-beta`), so both live side by side and the beta widget talks to the beta app. Set `DEVICE_ID` (env or `Config/Local.xcconfig`; `xcrun devicectl list devices`), then:
+> The `devicectl` targets below (`make beta`, `make stable-install`, `make phone-session`) are **not the phone install path**; they are for simulator, CI and home-LAN development. To install on the captain's phone use OTA over Tailscale: [`docs/ota.md`](docs/ota.md).
+
+Two apps (runbook rules 1, 2, 4): stable `com.trillium.pocketpalette` and beta `com.trillium.pocketpalette.beta` ("PocketPalette β", orange β BETA icon, `#if BETA`), each with its own widget (`.widget` / `.beta.widget`), App Group and widget link scheme (`pocketpalette` / `pocketpalette-beta`), so both live side by side and the beta widget talks to the beta app. For the dev-only `devicectl` targets set `DEVICE_ID` (env or `Config/Local.xcconfig`; `xcrun devicectl list devices`), then:
 - `make beta` builds the "PocketPalette Beta" scheme (app and widget) and installs it, no gate.
 - `make ship-gate` then `make stable-install` installs the stable app, and refuses unless `build/ship-pass/<HEAD sha>.json` exists for exactly this clean commit on `main`. The gate checks no unmerged `fm/*` branch exists, the tree is clean, `make check` passes, and the built app launched in the simulator prints `FMSelfCheck: ok` (`scripts/smoke.sh`).
 
 Both installs append a line to `~/.ios-install-ledger.tsv` (`LEDGER=` overrides): time, device, bundle id, commit, build, gate pass. Both need signing, and the `.beta` ids (app, widget and App Group) registered by hand (`docs/day-one-checklist.md`).
 
 ## Phone sessions
+(Dev tooling around `devicectl`; not an install path. Install with `make ota`, see `docs/ota.md`.)
 
 Every device session goes through one wrapper (runbooks-84o rule 5): `make phone-session CMD='make beta'`, or `scripts/phone-session.sh <command...>`. It guarantees the stable app is not left changed:
 - It takes the lock `~/.fm-phone-lock` (a directory holding `pid`, `started`, `command`; one phone, one lock across all apps). A live holder makes it refuse and say who holds it; a dead holder, or one older than `PHONE_SESSION_TIMEOUT` (default `30m`; seconds or `Ns`/`Nm`/`Nh`), is reported and reclaimed.

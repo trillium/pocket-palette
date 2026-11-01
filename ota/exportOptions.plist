@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Ad-hoc export for `make ota` (runbooks-c62; mirrors ~/code/TinyKeyboard/exportOptions.plist).
+	     teamID must equal DEVELOPMENT_TEAM (Config/Local.xcconfig); scripts/ota.sh refuses a mismatch. -->
+	<key>method</key>
+	<string>ad-hoc</string>
+	<key>teamID</key>
+	<string>85PWBA3B59</string>
+	<key>signingStyle</key>
+	<string>automatic</string>
+	<key>destination</key>
+	<string>export</string>
+	<key>uploadSymbols</key>
+	<false/>
+</dict>
+</plist>

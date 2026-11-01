@@ -13,9 +13,11 @@ Legend: **[HAND]** only the Apple account holder can do it (no script can or sho
 8. **[HAND]** Register the bundle id: developer.apple.com > Certificates, Identifiers & Profiles > Identifiers > **+** > App IDs > App. Use exactly the bundle id from `Config/Base.xcconfig`. (With the API key, `make archive` can create it automatically; registering by hand is the explicit alternative.)
 9. **[HAND]** Create the app record: App Store Connect > Apps > **+** > New App. Pick the same bundle id, a unique SKU, and a name. This must exist before the first upload.
 10. **[HAND]** Replace the placeholder icon `App/Sources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` with your 1024x1024 opaque PNG (no alpha). TestFlight accepts the placeholder; the App Store does not.
-11. **[HAND]** Register the beta ids too (`make beta` cannot be signed without them): `<bundle id>.beta` and `<bundle id>.beta.widget`, plus the App Group `group.<bundle id>.beta`, as in step 8. The widget's entitlement needs the same App Group.
+11. **[HAND]** Register the beta ids too (the dev-only `make beta` cannot be signed without them): `<bundle id>.beta` and `<bundle id>.beta.widget`, plus the App Group `group.<bundle id>.beta`, as in step 8. The widget's entitlement needs the same App Group.
 
 ### C. Every build
+To put a build on the captain's iPhone, do not use USB, Xcode Run or `devicectl`: run `make ship-gate`, `make ota`, `make ota-serve` and open the page in Safari over Tailscale (`docs/ota.md`). The steps below are the TestFlight route.
+
 11. **[SCRIPT]** `make doctor SIGNING=1` must show no FAIL lines.
 12. **[SCRIPT]** `make archive` (version and build number are stamped from git tags; see `docs/versioning.md`) (signed release archive).
 13. **[SCRIPT]** `make upload` first: a dry run that prints exactly what would be sent. Then `make upload CONFIRM=1` to send for real.
