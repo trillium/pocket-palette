@@ -16,7 +16,7 @@
 <body>
 	<h1>__TITLE__</h1>
 	<p class="version">version __VERSION_LABEL__ &middot; build __BUNDLE_VERSION__ &middot; passed the ship gate __PASSED_AT__</p>
-	<p>Open this page in Safari on your iPhone (Tailscale connected), then tap install.</p>
+	<p>Tester install page (tailnet only).</p>
 	<a class="install" href="__INSTALL_URL__">Install __TITLE__</a>
 	<div class="rollback-list">__ROLLBACK__</div>
 </body>

@@ -11,7 +11,8 @@ fail() { echo "phone-session test FAILED: $*" >&2; exit 1; }
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"; [ -z "${holder:-}" ] || kill "$holder" 2>/dev/null || true' EXIT
 
-export HOME="$tmp/home" DEVICE_ID=FAKE-DEVICE
+export HOME="$tmp/home"
+unset DEVICE_ID   # phone-session gets it from phone-reach, never from the environment
 mkdir -p "$HOME"
 phone="$tmp/phone"; stubs="$tmp/stubs"; mkdir -p "$phone" "$stubs"
 export STUB_PHONE="$phone" OTA_DIR="$tmp/ota" INSTALL_LEDGER="$tmp/ledger.tsv" PHONE_SESSION_TIMEOUT=30m
@@ -38,7 +39,14 @@ case "$3" in
     case "$last" in *.ipa) cp "$last" "$STUB_PHONE/stable" ;; *) echo beta-install >"$STUB_PHONE/beta" ;; esac ;;
 esac
 STUB
-chmod +x "$stubs/xcrun"
+# phone-reach stub: records that it ran under the lock and with which arguments; STUB_REACH_FAIL makes the phone unreachable.
+cat >"$stubs/phone-reach" <<'STUB'
+#!/usr/bin/env bash
+[ -d "$HOME/.fm-phone-lock" ] && echo "locked $*" >>"$STUB_PHONE/reach.log" || echo "UNLOCKED $*" >>"$STUB_PHONE/reach.log"
+[ -z "${STUB_REACH_FAIL:-}" ] || { echo "phone-reach: no road to the phone" >&2; exit 1; }
+echo FAKE-DEVICE
+STUB
+chmod +x "$stubs/xcrun" "$stubs/phone-reach"
 export PATH="$stubs:$PATH"
 
 # Known good: commit abc1234, build 1, gate pass; the kept OTA artifact for it has build 20261024000000.
@@ -70,6 +78,17 @@ grep -q "bash -c" <<<"$out" || fail "lock does not record the command: $out"
 grep -q "no restore needed" <<<"$out" || fail "no restore message: $out"
 [ ! -e "$marker" ] || fail "marker written on a clean session"
 grep -q "installed before: .*$stable_id 0.1.0 (1)" <<<"$out" || fail "apps were not recorded before the run: $out"
+
+# 1b. DEVICE_ID comes from `phone-reach --wait 120`, run once the lock is held, and reaches the command
+[ "$(cat "$phone/reach.log")" = "locked --wait 120" ] || fail "phone-reach not run once, under the lock, with --wait 120: $(cat "$phone/reach.log")"
+out="$(run bash -c 'echo "device=$DEVICE_ID session=$PHONE_SESSION_ACTIVE"')" || fail "device session failed: $out"
+grep -q "device=FAKE-DEVICE session=1" <<<"$out" || fail "command did not get DEVICE_ID from phone-reach: $out"
+
+# 1c. phone-reach fails: lock released, command not run, no devicectl call, no restore marker, exit 1
+reset_phone
+if out="$(STUB_REACH_FAIL=1 run touch "$tmp/ran-unreachable")"; then fail "ran although phone-reach failed"; fi
+[ ! -e "$tmp/ran-unreachable" ] && [ ! -e "$lock" ] && [ ! -e "$marker" ] && [ ! -e "$phone/install.log" ] || fail "unreachable phone mishandled: $out"
+grep -q "phone-reach failed" <<<"$out" || fail "no plain message when phone-reach fails: $out"
 
 # 2. stale lock (dead pid) is reported and reclaimed; the stable app is checked first
 reset_phone

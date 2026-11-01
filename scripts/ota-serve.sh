@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# make ota-serve: serve OTA_DIR (what `make ota` publishes) over tailnet-only HTTPS. Idempotent.
+# make ota-serve (non-captain fallback, docs/ota.md): serve OTA_DIR (what `make ota` publishes) over tailnet-only HTTPS. Idempotent.
 #   1. a static server on 127.0.0.1:OTA_LOCAL_PORT (python3 http.server, backgrounded, loopback only)
 #   2. `tailscale serve --bg --https=OTA_HTTPS_PORT` in front of it, with a real *.ts.net certificate
 # Never Funnel: it refuses if the port is already mapped to something else or is Funnel-enabled.

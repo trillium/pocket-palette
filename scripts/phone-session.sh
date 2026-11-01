@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # make phone-session CMD='...': the one wrapper every device session goes through (runbooks-84o rule 5).
-# DEV TOOLING, NOT AN INSTALL PATH: the captain's phone is installed only by `make ota` over Tailscale (docs/ota.md).
+# Every phone script goes through here: `make stable-install` and `make beta` run install.sh under this wrapper, so the
+# captain's phone is reached over Tailscale (phone-reach) with no link and no tap.
 #   phone-session.sh <command...>
 # Takes the phone lock (mkdir $PHONE_LOCK, default ~/.fm-phone-lock, holding pid, start time and command), records the
 # installed apps (xcrun devicectl device info apps), runs the command under a watchdog (PHONE_SESSION_TIMEOUT, default
@@ -11,20 +12,21 @@
 #   ship-gated OTA build (OTA_DIR/builds/<id>/, meta.json pass true, same commit); with none, nothing is installed.
 #   Phone locked/offline: one plain sentence, ~/.fm-phone-restore-pending (PHONE_RESTORE_MARKER) is written for the audit,
 #   exit non-zero; the next run with the marker present retries the restore before anything else.
-# Device: DEVICE_ID from the environment or Config/Local.xcconfig. Never uploads anything. Bash 3.2 compatible.
+# Device: after the lock is taken, `DEVICE_ID="$(phone-reach --wait 120)"` brings up the tailnet CoreDevice bridge (LAN is
+# the automatic fallback) and prints the device id; if the phone is not reachable the lock is released and nothing runs.
+# The command inherits DEVICE_ID and PHONE_SESSION_ACTIVE=1. Never uploads anything. Bash 3.2 compatible.
 # shellcheck disable=SC2329  # the trap handlers are reached by signal, not by name
 set -euo pipefail
 # shellcheck source-path=SCRIPTDIR source=lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 [ $# -gt 0 ] || { echo "usage: phone-session.sh <command...>   (or: make phone-session CMD='...')" >&2; exit 2; }
-for t in jq xcrun; do require_tool "$t" "needed by make phone-session"; done
+for t in jq xcrun phone-reach; do require_tool "$t" "needed by make phone-session"; done
 
 LOCK="${PHONE_LOCK:-$HOME/.fm-phone-lock}"
 MARKER="${PHONE_RESTORE_MARKER:-$HOME/.fm-phone-restore-pending}"
 OTA_DIR="${OTA_DIR:-$HOME/ota/$(printf '%s' "$APP_NAME" | tr '[:upper:]' '[:lower:]')}"
-device="$(cfg DEVICE_ID)"
-[ -n "$device" ] || die "no device: set DEVICE_ID (env or Config/Local.xcconfig); list devices with 'xcrun devicectl list devices'"
+device=""
 
 timeout_s="${PHONE_SESSION_TIMEOUT:-30m}"
 case "$timeout_s" in
@@ -167,6 +169,11 @@ trap 'on_signal TERM 143' TERM
 
 acquire_lock "$@"
 locked=1
+
+# The lock is held: make the phone reachable (tailnet bridge, LAN fallback) before the first devicectl call.
+DEVICE_ID="$(phone-reach --wait 120)" || { locked=0; rm -rf "$LOCK"; say "phone is not reachable (phone-reach failed); nothing was run"; exit 1; }
+device="$DEVICE_ID"
+export DEVICE_ID PHONE_SESSION_ACTIVE=1
 
 # A crashed earlier session (stale lock) or an unreachable phone (marker) means the stable app may be wrong: check first.
 if [ -e "$MARKER" ] || [ "$reclaimed" = 1 ]; then

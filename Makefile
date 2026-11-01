@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-# One line per beta / stable-install (devicectl dev tools, NOT the phone install path: that is `make ota`), tab-separated: time, device, bundle id, commit, build, gate pass (yes|no).
+# One line per beta / stable-install (devicectl over Tailscale via phone-reach), tab-separated: time, device, bundle id, commit, build, gate pass (yes|no).
 LEDGER ?= $(HOME)/.ios-install-ledger.tsv
 SCRIPT_FILES := $(wildcard scripts/*.sh) $(wildcard .githooks/*)
 
@@ -38,15 +38,15 @@ unmerged: ## list fm/*, macbook/*, macbook-wip/* branches with commits not on ma
 	scripts/unmerged-branches.sh $(UNMERGED_ARGS)
 ship-gate: ## prove an integrated head: unmerged-free, HEAD = main tip, clean tree, make check, built-app smoke; writes build/ship-pass/<sha>.json
 	scripts/ship-gate.sh
-ota: ## THE phone install: gated ad-hoc .ipa + itms-services manifest into OTA_DIR (~/ota/pocketpalette); run make ship-gate first (docs/ota.md)
+ota: ## NON-CAPTAIN FALLBACK, never the captain's install path: gated ad-hoc .ipa + itms-services manifest into OTA_DIR (docs/ota.md)
 	scripts/ota.sh
-ota-serve: ## serve OTA_DIR over tailnet-only HTTPS :8782 (tailscale serve, never Funnel); idempotent (docs/ota.md)
+ota-serve: ## non-captain fallback: serve OTA_DIR over tailnet-only HTTPS :8782 (tailscale serve, never Funnel); idempotent (docs/ota.md)
 	scripts/ota-serve.sh
-beta: ## NOT the phone install path (use make ota). Dev/CI only: build the Beta scheme and devicectl-install it on DEVICE_ID; no gate
+beta: ## build the Beta scheme and install it on the phone over Tailscale (phone-session + phone-reach); no gate
 	INSTALL_LEDGER=$(LEDGER) scripts/install.sh beta
-stable-install: ## NOT the phone install path (use make ota). Dev/CI only: devicectl-install the stable app on DEVICE_ID; REFUSES without a ship-gate pass for HEAD; appends to LEDGER
+stable-install: ## THE captain's install: automatic over Tailscale, no link, no tap; REFUSES without a ship-gate pass for HEAD (run make ship-gate first); appends to LEDGER
 	INSTALL_LEDGER=$(LEDGER) scripts/install.sh stable
-phone-session: ## NOT an install path (use make ota). Dev only: run CMD under the phone lock; afterwards restore the stable app if it changed (README: Phone sessions)
+phone-session: ## run CMD under the phone lock with DEVICE_ID from phone-reach; afterwards restore the stable app if it changed (README: Phone sessions)
 	@test -n "$$CMD" || { echo "usage: make phone-session CMD='...'" >&2; exit 2; }
 	INSTALL_LEDGER=$(LEDGER) scripts/phone-session.sh bash -c "$$CMD"
 archive: ## signed release archive (needs Apple signing; see docs/signing.md)

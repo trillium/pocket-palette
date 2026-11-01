@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# make beta / make stable-install: DEV/CI TOOLING, NOT THE PHONE INSTALL PATH. The captain's iPhone is installed only by
-# `make ship-gate && make ota && make ota-serve` over Tailscale (docs/ota.md). This builds for a connected device and installs it
-# with `xcrun devicectl`, for simulator/CI/home-LAN development.
+# make beta / make stable-install: build for the phone and install it with `xcrun devicectl`. The captain's install path is
+# `make ship-gate && make stable-install`: the phone is reached over Tailscale (phone-reach) with no link and no tap.
+# Run directly it re-executes itself under scripts/phone-session.sh (the phone lock, then phone-reach, then restore check).
 #   install.sh beta     the "<App> Beta" scheme (bundle id <id>.beta); no gate, this is the daily-driver testing app.
 #   install.sh stable   the stable scheme and bundle id; REFUSES unless `make ship-gate` left
 #                       build/ship-pass/<HEAD sha>.json for exactly this commit on a clean tree (runbook rule 4).
-# Device: DEVICE_ID from the environment or Config/Local.xcconfig (`xcrun devicectl list devices`).
+# Device: under the phone lock, `DEVICE_ID="$(phone-reach --wait 120)"` (tailnet by default, LAN fallback); no configuration.
 # Each successful install appends one tab-separated line to INSTALL_LEDGER (default ~/.ios-install-ledger.tsv):
 #   <utc time> <device> <bundle id> <commit[.dirty]> <build number> <gate pass: yes|no>
 # Needs signing (docs/signing.md); never uploads anything. Bash 3.2 compatible.
@@ -19,7 +19,7 @@ case "$mode" in
   stable) scheme="$SCHEME"; configuration="Release"; bundle="$BUNDLE_ID" ;;
   *) echo "usage: install.sh beta|stable" >&2; exit 2 ;;
 esac
-for t in git jq xcodebuild xcrun; do require_tool "$t" "needed by make $([ "$mode" = beta ] && echo beta || echo stable-install)"; done
+for t in git jq xcodebuild xcrun phone-reach; do require_tool "$t" "needed by make $([ "$mode" = beta ] && echo beta || echo stable-install)"; done
 
 head_sha="$(git -C "$ROOT" rev-parse HEAD)"
 pass_file="$SHIP_PASS_DIR/$head_sha.json"
@@ -30,9 +30,12 @@ if [ "$mode" = stable ]; then
   [ -z "$(git -C "$ROOT" status --porcelain)" ] || die "working tree changed since the ship gate passed; commit it and run 'make ship-gate' again"
 fi
 
-device="$(cfg DEVICE_ID)"
-[ -n "$device" ] || die "no device: set DEVICE_ID (env or Config/Local.xcconfig); list devices with 'xcrun devicectl list devices'"
 is_placeholder "$TEAM_ID" && die "DEVELOPMENT_TEAM is unset (Config/Base.xcconfig); a device build must be signed"
+
+# Every phone call happens under the phone lock: take it (and restore the stable app afterwards) via phone-session.
+[ -n "${PHONE_SESSION_ACTIVE:-}" ] || exec "$ROOT/scripts/phone-session.sh" "$ROOT/scripts/install.sh" "$mode"
+DEVICE_ID="$(phone-reach --wait 120)" || exit 1
+device="$DEVICE_ID"
 
 generate_project
 args=()
